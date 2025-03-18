@@ -1,0 +1,39 @@
+/* Deixar o rodapé fixo no final da página */
+html, body {
+    height: 100%; /* Altura total da tela */
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    flex: 1; /* Faz o conteúdo ocupar o espaço disponível */
+}
+
+.footer {
+    margin-top: auto; /* Faz o rodapé ser empurrado para o final */
+}
+
+h1 {
+    color: #343a40;
+}
+
+.card {
+    border: none;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.btn-primary, .btn-success {
+    border-radius: 25px;
+}
+
+img {
+    object-fit: cover;
+    height: 300px;
+}
