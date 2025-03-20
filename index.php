@@ -4,16 +4,24 @@
 
 <div class="d-flex justify-content-between mb-4">
     <!-- Campo de pesquisa -->
-    <input type="text" id="pesquisa" class="form-control me-2" placeholder="🔎 Buscar filme...">
+    <input type="text" id="pesquisa" class="form-control me-2" placeholder="🔎 Buscar filme..." oninput="filtrarFilmes()">
     
     <!-- Filtro por gênero -->
-    <select id="filtro-genero" class="form-select me-2">
+    <select id="filtro-genero" class="form-select me-2" onchange="filtrarFilmes()">
         <option value="">Todos os Gêneros</option>
     </select>
-
-    <!-- Botão de busca (desativado até carregar os filmes) -->
-    <button id="btn-buscar" class="btn btn-primary" onclick="filtrarFilmes()" disabled>Buscar</button>
 </div>
+
+<!-- Adicionar CSS para garantir a responsividade da imagem -->
+<style>
+    /* Ajustes para a responsividade da imagem */
+    .card-img-top {
+        width: 100%; /* A imagem ocupa toda a largura do card */
+        height: auto; /* A altura será ajustada automaticamente para manter a proporção */
+        object-fit: cover; /* Mantém a imagem coberta sem distorção */
+        max-height: 250px; /* Limita a altura máxima para não exagerar em telas grandes */
+    }
+</style>
 
 <div class="row" id="lista-filmes">
     <!-- Os filmes serão carregados dinamicamente aqui -->
@@ -28,7 +36,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">
-                <img id="detalhesCapa" src="" class="img-fluid mb-3" alt="">
+                <img id="detalhesCapa" src="" class="img-fluid mb-3" alt="Imagem do Filme">
                 <h5 id="detalhesTitulo"></h5>
                 <p id="detalhesSinopse"></p>
                 <a id="detalhesTrailer" href="#" target="_blank" class="btn btn-primary w-100">Assistir Trailer</a>
@@ -64,20 +72,43 @@
         let html = '';
         lista.forEach(filme => {
             html += `
-                <div class="col-md-4 mb-4" data-titulo="${filme.titulo.toLowerCase()}" data-genero="${filme.genero.toLowerCase()}">
+                <div class="col-md-4 mb-4" data-id="${filme.id}">
                     <div class="card h-100 shadow-sm">
                         <img src="${filme.capa}" class="card-img-top" alt="${filme.titulo}">
                         <div class="card-body">
                             <h5 class="card-title">${filme.titulo}</h5>
                             <p class="card-text">${filme.sinopse}</p>
-                            <a href="${filme.trailer}" target="_blank" class="btn btn-primary w-100">Assistir Trailer</a>
-                            <button class="btn btn-info w-100 mt-2" onclick="verDetalhes('${filme.titulo}', '${filme.sinopse}', '${filme.capa}', '${filme.trailer}')">Ver Detalhes</button>
+                            <a href="${filme.link}" target="_blank" class="btn btn-primary w-100">Assistir Trailer</a>
+                            <button class="btn btn-info w-100 mt-2" onclick="verDetalhes('${filme.titulo}', '${filme.sinopse}', '${filme.capa}', '${filme.link}')">Ver Detalhes</button>
+                            <button class="btn btn-danger w-100 mt-2" onclick="excluirFilme(${filme.id})">Excluir</button>
                         </div>
                     </div>
                 </div>
             `;
         });
         document.getElementById('lista-filmes').innerHTML = html;
+    }
+
+    // Excluir filme
+    function excluirFilme(id) {
+        if (!confirm('Tem certeza que deseja excluir este filme?')) return;
+
+        fetch(`api.php?id=${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.querySelector(`div[data-id="${id}"]`).remove(); // Remove o filme da lista
+                alert(data.message);
+            } else {
+                alert(`Erro ao excluir filme: ${data.message}`);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao excluir filme:', error);
+            alert('Erro ao excluir o filme.');
+        });
     }
 
     // Carregar lista de gêneros

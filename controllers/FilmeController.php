@@ -12,7 +12,7 @@ class FilmeController {
     public function cadastrarFilme($titulo, $sinopse, $generos, $capa, $trailer, $data_lancamento, $duracao) {
         // Salvar imagem na pasta 'uploads/imagens'
         $capa_nome = time() . '-' . basename($capa['name']);
-        $capa_destino = 'uploads/imagens/' . $capa_nome;
+        $capa_destino = 'imagens/' . $capa_nome;
 
         // Move a imagem para a pasta
         if (move_uploaded_file($capa['tmp_name'], $capa_destino)) {
@@ -30,6 +30,34 @@ class FilmeController {
 
             return true;
         }
+        return false;
+    }
+
+    // Método para excluir filme
+    public function excluirFilme($id) {
+        // Primeiro, buscamos a capa associada ao filme
+        $stmt = $this->db->prepare("SELECT capa FROM filmes WHERE id = ?");
+        $stmt->execute([$id]);
+        $filme = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($filme) {
+            // Exclui a imagem da pasta 'imagens'
+            $capa_path = $filme['capa'];
+            if (file_exists($capa_path)) {
+                unlink($capa_path);
+            }
+
+            // Exclui as relações do filme com os gêneros
+            $stmt = $this->db->prepare("DELETE FROM filme_genero WHERE filme_id = ?");
+            $stmt->execute([$id]);
+
+            // Exclui o filme da tabela filmes
+            $stmt = $this->db->prepare("DELETE FROM filmes WHERE id = ?");
+            $stmt->execute([$id]);
+
+            return true;
+        }
+
         return false;
     }
 }
