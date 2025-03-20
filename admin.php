@@ -15,12 +15,16 @@
         <div class="mb-3">
             <label for="genero" class="form-label">Gênero</label>
             <select class="form-control" id="genero" name="genero_id" required>
-                <!-- Gêneros serão carregados dinamicamente -->
+                <option value="">Selecione um gênero</option>
             </select>
         </div>
         <div class="mb-3">
             <label for="imagem" class="form-label">Imagem</label>
             <input type="file" class="form-control" id="imagem" name="imagem" required>
+        </div>
+        <div class="mb-3">
+            <label for="trailer" class="form-label">Link do Trailer</label>
+            <input type="url" class="form-control" id="trailer" name="trailer" required placeholder="https://example.com/trailer">
         </div>
         <button type="submit" class="btn btn-success w-100">Salvar</button>
     </form>
@@ -29,14 +33,23 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         // Carregar gêneros dinamicamente
-        fetch('api.php?generos')
-            .then(response => response.json())
+        fetch('api.php?tipo=genero')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar gêneros');
+                }
+                return response.json();
+            })
             .then(data => {
-                let options = '';
+                let options = '<option value="">Selecione um gênero</option>';
                 data.forEach(genero => {
                     options += `<option value="${genero.id}">${genero.nome}</option>`;
                 });
                 document.getElementById('genero').innerHTML = options;
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao carregar os gêneros.');
             });
 
         // Salvar filme
@@ -48,10 +61,19 @@
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao salvar o filme');
+                }
+                return response.json();
+            })
             .then(data => {
                 alert(data.message);
-                window.location.reload();
+                window.location.reload();  // Atualiza a página após salvar
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao salvar o filme.');
             });
         });
     });

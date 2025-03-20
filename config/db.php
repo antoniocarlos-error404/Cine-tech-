@@ -1,7 +1,7 @@
 <?php
 
 // Conectar ao banco de dados MySQL
-$host = 'localhost';
+$host = '127.0.0.1';
 $dbname = 'cine_tech';
 $username = 'root';
 $password = '';
