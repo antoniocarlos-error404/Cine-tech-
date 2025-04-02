@@ -23,9 +23,10 @@
             <input type="date" class="form-control" id="data_lancamento" name="data_lancamento" required>
         </div>
         <div class="mb-3">
-            <label for="duracao" class="form-label">Duração (horas)</label>
-            <input type="number" class="form-control" id="duracao" name="duracao" required min="1">
+          <label for="duracao" class="form-label">Duração (HH:MM)</label>
+           <input type="time" class="form-control" id="duracao" name="duracao" required step="60">
         </div>
+   
         <div class="mb-3">
             <label for="imagem" class="form-label">Imagem</label>
             <input type="file" class="form-control" id="imagem" name="imagem" required accept=".jpg, .jpeg, .png">
