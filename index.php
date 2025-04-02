@@ -15,9 +15,7 @@
     </div>
 </div>
 
-<!-- Adicionar CSS para garantir a responsividade da imagem -->
 <style>
-    /* Ajustes para a responsividade da imagem */
     .card-img-top {
         width: 100%;
         height: auto;
@@ -53,6 +51,8 @@
                 <img id="detalhesCapa" src="" class="img-fluid mb-3" alt="Imagem do Filme">
                 <h5 id="detalhesTitulo"></h5>
                 <p id="detalhesSinopse"></p>
+                <p id="duracao"></p>
+                <p id="data_lancamento"></p>  
                 <a id="detalhesTrailer" href="#" target="_blank" class="btn btn-primary w-100">Assistir Trailer</a>
             </div>
         </div>
@@ -88,7 +88,7 @@
                             <h5 class="card-title">${filme.titulo}</h5>
                             <p class="card-text">${filme.sinopse}</p>
                             <a href="${filme.link}" target="_blank" class="btn btn-primary w-100">Assistir Trailer</a>
-                            <button class="btn btn-info w-100 mt-2" onclick="verDetalhes('${filme.titulo}', '${filme.sinopse}', '${filme.capa}', '${filme.link}')">Ver Detalhes</button>
+                            <button class="btn btn-info w-100 mt-2" onclick="verDetalhes('${filme.titulo}', '${filme.sinopse}', '${filme.capa}', '${filme.link}', '${filme.duracao}', '${filme.data_lancamento}')">Ver Detalhes</button>
                             <button class="btn btn-danger w-100 mt-2" onclick="excluirFilme(${filme.id})">Excluir</button>
                         </div>
                     </div>
@@ -99,25 +99,38 @@
     }
 
     function excluirFilme(id) {
-        if (!confirm('Tem certeza que deseja excluir este filme?')) return;
+    if (!confirm('Tem certeza que deseja excluir este filme?')) return;
+    
+    // Seleciona o botão de exclusão e adiciona o spinner que e a bolinha de carregamento
+    const botao = document.querySelector(`div[data-id="${id}"] .btn-danger`);
+    botao.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Excluindo...';
+    botao.disabled = true;
 
-        fetch(`api.php?id=${id}`, {
-            method: 'DELETE'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                document.querySelector(`div[data-id="${id}"]`).remove();
-                alert(data.message);
-            } else {
-                alert(`Erro ao excluir filme: ${data.message}`);
-            }
-        })
-        .catch(error => {
-            console.error('Erro ao excluir filme:', error);
-            alert('Erro ao excluir o filme.');
-        });
-    }
+    fetch('api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `id=${id}&_method=DELETE&tipo=filme`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert(data.message);
+            location.reload(); // Recarrega a página após exclusão bem-sucedida
+        } else {
+            alert(`Erro ao excluir filme: ${data.message}`);
+            botao.innerHTML = 'Excluir'; // Restaura o botão
+            botao.disabled = false;
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao excluir filme:', error);
+        alert('Erro ao excluir o filme.');
+        botao.innerHTML = 'Excluir'; // Restaura o botão
+        botao.disabled = false;
+    });
+}
+
+
 
     function carregarGeneros() {
         fetch('api.php?tipo=genero')
@@ -152,11 +165,13 @@
         renderizarFilmes(filmesFiltrados);
     }
 
-    function verDetalhes(titulo, sinopse, capa, trailer) {
+    function verDetalhes(titulo, sinopse, capa, trailer, duracao, data_lancamento) {
         document.getElementById('detalhesTitulo').innerText = titulo;
         document.getElementById('detalhesSinopse').innerText = sinopse;
         document.getElementById('detalhesCapa').src = capa;
         document.getElementById('detalhesTrailer').href = trailer;
+        document.getElementById('duracao').innerText = `Duração: ${duracao} horas`;
+        document.getElementById('data_lancamento').innerText = `Lançamento: ${data_lancamento}`;
 
         const modal = new bootstrap.Modal(document.getElementById('detalhesFilmeModal'));
         modal.show();
