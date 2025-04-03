@@ -57,7 +57,7 @@ arduino
 Copiar
 Editar
 http://localhost/phpmyadmin
-Clique em Novo → Digite o nome do banco (mesmo nome do db.php) → Clique em Criar.
+Clique em Novo → Digite o nome do banco (mesmo nome do db.php) → Clique em Criar, va em inportar e inporte o banco de dados cine_tech acima e execute .
 
 Vá na aba Importar, selecione o arquivo .sql do banco e clique em Executar.
 
